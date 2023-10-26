@@ -23,9 +23,11 @@ export type ReactionFormData = {
 
 function Testform() {
   const initFormStatus =
-    localStorage["reaction-app"] === undefined ? FormStatus.LOCKED : FormStatus.DONE;
+    localStorage["reaction-app"] === undefined
+      ? FormStatus.LOCKED
+      : FormStatus.DONE;
   const [currentFormState, setFormState] = useState<FormStatus>(initFormStatus);
-  
+
   const formdataRef = useRef<ReactionFormData>({
     gender: null,
     age: null,
@@ -102,33 +104,39 @@ function Testform() {
           Vielen Dank, dass Du teilgenommen hast!
         </p>
       )}
-      <div className="control">
+      <div className="control radios">
         <label htmlFor="gender">Geschlecht</label>
         <br />
-        <input
-          type="radio"
-          id="female"
-          name="gender"
-          value="female"
-          onChange={genderHandler}
-        />
-        <label htmlFor="female">Weiblich</label>
-        <input
-          type="radio"
-          id="male"
-          name="gender"
-          value="male"
-          onChange={genderHandler}
-        />
-        <label htmlFor="male">Männlich</label>
-        <input
-          type="radio"
-          id="other"
-          name="gender"
-          value="other"
-          onChange={genderHandler}
-        />
-        <label htmlFor="other">Andere</label>
+        <span>
+          <input
+            type="radio"
+            id="female"
+            name="gender"
+            value="female"
+            onChange={genderHandler}
+          />
+          <label htmlFor="female">Weiblich</label>
+        </span>
+        <span>
+          <input
+            type="radio"
+            id="male"
+            name="gender"
+            value="male"
+            onChange={genderHandler}
+          />
+          <label htmlFor="male">Männlich</label>
+        </span>
+        <span>
+          <input
+            type="radio"
+            id="other"
+            name="gender"
+            value="other"
+            onChange={genderHandler}
+          />
+          <label htmlFor="other">Andere</label>
+        </span>
       </div>
       <div className="control slider-control">
         <label htmlFor="age">Alter</label>
