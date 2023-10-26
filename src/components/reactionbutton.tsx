@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { updateResults } from "./testform";
 
 enum Status {
+  LOCKED = "locked",
   INIT = "init",
   CLICKTOSTART = "clicktostart",
   TESTWAIT = "testwait",
@@ -11,15 +12,17 @@ enum Status {
   TESTRESULT = "testresult",
 }
 
-function Reactiontest() {
-  const [currentTestState, setTestState] = useState<Status>(Status.INIT);
+function Reactiontest(props : {
+  locked: boolean;
+}) {
+  const [currentTestState, setTestState] = useState<Status>(Status.LOCKED);
   let timeout = useRef<ReturnType<typeof setInterval> | null>(null);
   let results = useRef<number[]>([]);
   let prevtime = useRef<number>(0);
+  if (!props.locked && currentTestState === Status.LOCKED) {
+    setTestState(Status.INIT);
+  }
   function buttonHandler() {
-    if (results.current.length === 5) {
-      updateResults({ reactiontests: results.current });
-    }
     switch (currentTestState) {
       case Status.INIT:
         setTestState(Status.CLICKTOSTART);
@@ -40,6 +43,7 @@ function Reactiontest() {
         break;
       case Status.TESTREACT:
         results.current.push(Date.now() - prevtime.current);
+        updateResults({ reactiontests: results.current });
         setTestState(Status.TESTRESULT);
         break;
       case Status.TESTRESULT:
@@ -51,8 +55,10 @@ function Reactiontest() {
   }
   function _reactionbuttonText() {
     switch (currentTestState) {
-      case Status.INIT:
-        return "Bereit für fünf kurze Reaktionstests?";
+      case Status.LOCKED:
+        return <span className="subtletext">Füllen Sie bitte zuerst das Formular aus...</span>;
+        case Status.INIT:
+          return "Bereit für fünf kurze Reaktionstests?";
       case Status.CLICKTOSTART:
         return (
           <span className="buttontext">
@@ -88,12 +94,18 @@ function Reactiontest() {
     }
   }
   return (
-    <button
-      className={"reactionbutton " + currentTestState}
-      onClick={buttonHandler}
-    >
-      {_reactionbuttonText()}
-    </button>
+    <div>
+      <label htmlFor="reactionbutton" className="reactionbuttonlabel">
+        Reaktionstest
+      </label>
+      <button
+        className={"reactionbutton " + currentTestState}
+        onClick={buttonHandler}
+        id="reactionbutton"
+      >
+        {_reactionbuttonText()}
+      </button>
+    </div>
   );
 }
 
