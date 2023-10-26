@@ -19,6 +19,7 @@ export type ReactionFormData = {
   gameHours: number | null;
   sportHours: number | null;
   reactiontests: number[] | null;
+  screenRes: number | null;
 };
 
 function Testform() {
@@ -27,7 +28,8 @@ function Testform() {
       ? FormStatus.LOCKED
       : FormStatus.DONE;
   const [currentFormState, setFormState] = useState<FormStatus>(initFormStatus);
-
+  const [width, height] = [window.screen.width, window.screen.height];
+  const screenRes = Math.min(width, height);
   const formdataRef = useRef<ReactionFormData>({
     gender: null,
     age: null,
@@ -35,6 +37,7 @@ function Testform() {
     gameHours: null,
     sportHours: null,
     reactiontests: [],
+    screenRes: screenRes,
   });
 
   const [gameHours, setGameHours] = React.useState(null as number | null);
@@ -93,19 +96,19 @@ function Testform() {
 
   return (
     <div className="testform">
-      <h1>Hallo! Herzlichen Dank!</h1>
+      <h1>Hello and welcome!</h1>
       <p className="subtletext">
-        ...dass Du Dir <span className="highlight">eine Minute</span> Zeit
-        nimmst, mir für ein Biomedizin-Modul zu helfen und diesen{" "}
-        <span className="highlight">anonymen</span> Reaktionstest zu machen.
+        Thanks for taking <span className="highlight">about one minute</span> of
+        your time to take this <span className="highlight">anonymous</span>{" "}
+        reaction test!
       </p>
       {currentFormState === FormStatus.DONE && (
         <p className="subtletext green">
-          Vielen Dank, dass Du teilgenommen hast!
+          Thanks for having participated in this test!
         </p>
       )}
       <div className="control radios">
-        <label htmlFor="gender">Geschlecht</label>
+        <label htmlFor="gender">Sex</label>
         <br />
         <span>
           <input
@@ -115,7 +118,7 @@ function Testform() {
             value="female"
             onChange={genderHandler}
           />
-          <label htmlFor="female">Weiblich</label>
+          <label htmlFor="female">Female</label>
         </span>
         <span>
           <input
@@ -125,22 +128,12 @@ function Testform() {
             value="male"
             onChange={genderHandler}
           />
-          <label htmlFor="male">Männlich</label>
-        </span>
-        <span>
-          <input
-            type="radio"
-            id="other"
-            name="gender"
-            value="other"
-            onChange={genderHandler}
-          />
-          <label htmlFor="other">Andere</label>
+          <label htmlFor="male">Male</label>
         </span>
       </div>
       <div className="control slider-control">
-        <label htmlFor="age">Alter</label>
-        <p className="output">{age !== null ? age + " Jahre" : ""}</p>
+        <label htmlFor="age">Age</label>
+        <p className="output">{age !== null ? age + " years" : ""}</p>
         <input
           type="range"
           id="age"
@@ -156,10 +149,10 @@ function Testform() {
       </div>
       <div className="control slider-control">
         <label htmlFor="gameHours">
-          Wie viele Stunden in der Woche spielst Du Computerspiele?
+          How many hours per week do you play computer games?
         </label>
         <p className="output">
-          {gameHours !== null ? gameHours + " Stunden" : ""}
+          {gameHours !== null ? gameHours + " hours" : ""}
         </p>
         <input
           type="range"
@@ -176,10 +169,10 @@ function Testform() {
       </div>
       <div className="control slider-control">
         <label htmlFor="sportHours">
-          Wie viele Stunden pro Woche treibst Du Sport?
+          How many hours per week do you do sports?
         </label>
         <p className="output">
-          {sportHours !== null ? sportHours + " Stunden" : ""}
+          {sportHours !== null ? sportHours + " hours" : ""}
         </p>
         <input
           type="range"
@@ -196,12 +189,12 @@ function Testform() {
       </div>
       <div className="control">
         <label htmlFor="email">
-          E-Mail <span className="subtletext">(freiwillig)</span>
+          Email <span className="subtletext">(not required)</span>
         </label>
         <input
           type="email"
           id="email"
-          placeholder="E-Mail, falls Du meine Arbeit lesen möchtest."
+          placeholder="If you're interested in the results, leave your email here..."
           ref={emailRef}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             updateResults({ email: e.target.value });

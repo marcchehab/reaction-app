@@ -46,49 +46,43 @@ function Reactiontest(props : {
   function _reactionbuttonText() {
     switch (currentFormState) {
       case FormStatus.LOCKED:
-        return <span className="subtletext">Füllen Sie bitte zuerst das Formular aus...</span>;
+        return <span className="subtletext">Please fill out the form first...</span>;
         case FormStatus.INIT:
-          return "Bereit für fünf kurze Reaktionstests?";
+          return "Ready for five short reaction tests?";
       case FormStatus.CLICKTOSTART:
         return (
           <span className="buttontext">
-            Diese Fläche <span className="red">wird zuerst rot</span>. Klicken
-            Sie dann <span className="red">nicht</span>!
+            Don't click too early! This area <span className="red">will first turn red</span>.
             <br />
-            Nach einigen Sekunden{" "}
-            <span className="green">wechselt sie zu grün</span>. Klicken Sie
-            dann so schnell wie möglich!
+            After a few seconds,{" "} <span className="green">it will turn green</span>. That's when you should click as fast as you can!
             <br />
             <br />
-            Wenn Sie weiterklicken, startet der Test...
+            Ready? Click to start the {results.current.length > 0 ? "next ": ""}test...
           </span>
         );
       case FormStatus.TESTWAIT:
-        return "Warten auf Grün...";
+        return "Wait for it to turn green...";
       case FormStatus.TESTEARLY:
-        return "Zu früh!";
+        return "Too early!";
       case FormStatus.TESTREACT:
-        return "Klick!";
+        return "Click!";
       case FormStatus.TESTRESULT:
         return (
           <span className="buttontext">
-            Reaktionszeit:{" "}
-            <b>{results.current[results.current.length - 1]} ms</b>
+            Reaction time: <b>{results.current[results.current.length - 1]} ms</b>
             <br />
-            Es bleiben noch <b>
-              {5 - results.current.length} Tests
-            </b> übrig. <br />
-            Klicken Sie weiter, wenn Sie bereit sind...
+            {5 - results.current.length} tests remain.<br />
+            Click when you are ready...
           </span>
         );
       case FormStatus.DONE:
-        return "Herzlichen Dank für Ihre Teilnahme!";
+        return "Thanks for participating!";
     }
   }
   return (
     <div>
       <label htmlFor="reactionbutton" className="reactionbuttonlabel">
-        Reaktionstest
+        Reaction test
       </label>
       <button
         className={"reactionbutton " + currentFormState}
