@@ -1,8 +1,20 @@
 import Reactionbutton from "./reactionbutton";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import "./testform.scss";
 
-type ReactionFormData = {
+console.log(process.env.NODE_ENV);
+
+export enum FormStatus {
+  LOCKED = "locked",
+  INIT = "init",
+  CLICKTOSTART = "clicktostart",
+  TESTWAIT = "testwait",
+  TESTEARLY = "testearly",
+  TESTREACT = "testreact",
+  TESTRESULT = "testresult",
+  DONE = "done",
+}
+export type ReactionFormData = {
   gender: string | null;
   age: number | null;
   email: string | null;
@@ -11,46 +23,69 @@ type ReactionFormData = {
   reactiontests: number[] | null;
 };
 
-let formdata: ReactionFormData = {
-  gender: null,
-  age: null,
-  email: null,
-  gameHours: null,
-  sportHours: null,
-  reactiontests: [],
-};
-let testlocked = true;
-
-/**
- * Updates global formdata object incrementally and calls submitData() when all fields are filled including 5 results
- *
- * @param newdata
- */
-export function updateResults(newdata: any) {
-  formdata = { ...formdata, ...newdata };
-  if (
-    formdata.gender !== null &&
-    formdata.age !== null &&
-    formdata.gameHours !== null &&
-    formdata.sportHours !== null
-  ) { testlocked = false; }
-  if (newdata.reactiontests !== undefined) {
-    if (newdata.reactiontests.length === 2) {
-      submitData();
-    }
-  }
-}
-
-function submitData() {
-  // props.onAddMeetup(meetupData);
-  console.log("submitting data");
-}
-
 function Testform() {
+  const [currentFormState, setFormState] = useState<FormStatus>(
+    FormStatus.LOCKED
+  );
+
+  const formdataRef = useRef<ReactionFormData>({
+    gender: null,
+    age: null,
+    email: null,
+    gameHours: null,
+    sportHours: null,
+    reactiontests: [],
+  });
+
   const [gameHours, setGameHours] = React.useState(null as number | null);
   const [sportHours, setSportHours] = React.useState(null as number | null);
   const [age, setAge] = React.useState(null as number | null);
   const emailRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * Updates global formdata object incrementally and calls submitData() when all fields are filled including 5 results
+   *
+   * @param newdata
+   */
+  function updateResults(newdata: any) {
+    formdataRef.current = { ...formdataRef.current, ...newdata };
+    if (
+      formdataRef.current.gender !== null &&
+      formdataRef.current.age !== null &&
+      formdataRef.current.gameHours !== null &&
+      formdataRef.current.sportHours !== null
+    ) {
+      setFormState(FormStatus.INIT);
+    }
+    if (newdata.reactiontests !== undefined) {
+      if (newdata.reactiontests.length === 5) {
+        submitData();
+      }
+    }
+  }
+
+  function submitData() {
+    console.log("submitting data");
+    let url = "";
+    if (process.env.NODE_ENV === "development") {
+      url = "https://reactionapp-f88bb-default-rtdb.europe-west1.firebasedatabase.app/testflight.json";
+    } else {
+      url = "https://reactionapp-f88bb-default-rtdb.europe-west1.firebasedatabase.app/results.json";
+    }
+    fetch(
+      url,
+      {
+        method: "POST",
+        body: JSON.stringify(formdataRef.current),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then(() => {
+      console.log("data submitted");
+      setFormState(FormStatus.DONE);
+    });
+  }
 
   const genderHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateResults({ gender: e.target.value });
@@ -60,8 +95,9 @@ function Testform() {
     <div className="testform">
       <h1>Hallo! Herzlichen Dank!</h1>
       <p className="subtletext">
-        ...dass Du Dir <span className="highlight">eine Minute</span> Zeit nimmst, mir für ein
-        Biomedizin-Modul zu helfen und diesen <span className="highlight">anonymen</span> Reaktionstest zu machen.
+        ...dass Du Dir <span className="highlight">eine Minute</span> Zeit
+        nimmst, mir für ein Biomedizin-Modul zu helfen und diesen{" "}
+        <span className="highlight">anonymen</span> Reaktionstest zu machen.
       </p>
       <div className="control">
         <input
@@ -148,7 +184,9 @@ function Testform() {
       </div>
 
       <div className="control">
-        <label htmlFor="email">E-Mail <span className="subtletext">(freiwillig)</span></label>
+        <label htmlFor="email">
+          E-Mail <span className="subtletext">(freiwillig)</span>
+        </label>
         <input
           type="email"
           id="email"
@@ -159,12 +197,13 @@ function Testform() {
           }}
         />
       </div>
-      <Reactionbutton locked={testlocked} />
+      <Reactionbutton
+        formstate={[currentFormState, setFormState]}
+        updateresults={updateResults}
+      />
       <div id="reponse"></div>
     </div>
   );
 }
 
 export default Testform;
-//
-// https://script.google.com/macros/s/AKfycbybcaKcgAscph_dDSg71WrDymuAggux4dweGAcRfLoeRhsmHfvUf59O4Txj4Crxx4am/exec

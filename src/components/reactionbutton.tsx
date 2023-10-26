@@ -1,65 +1,55 @@
 import "./reactionbutton.scss";
-import { useState, useRef } from "react";
-import { updateResults } from "./testform";
-
-enum Status {
-  LOCKED = "locked",
-  INIT = "init",
-  CLICKTOSTART = "clicktostart",
-  TESTWAIT = "testwait",
-  TESTEARLY = "testearly",
-  TESTREACT = "testreact",
-  TESTRESULT = "testresult",
-}
+import { useRef } from "react";
+import { FormStatus, ReactionFormData } from "./testform";
 
 function Reactiontest(props : {
-  locked: boolean;
+  formstate: [FormStatus, React.Dispatch<React.SetStateAction<FormStatus>>];
+  updateresults: (newdata: Partial<ReactionFormData>) => void;
 }) {
-  const [currentTestState, setTestState] = useState<Status>(Status.LOCKED);
+  const [currentFormState, setFormState] = props.formstate;
   let timeout = useRef<ReturnType<typeof setInterval> | null>(null);
   let results = useRef<number[]>([]);
   let prevtime = useRef<number>(0);
-  if (!props.locked && currentTestState === Status.LOCKED) {
-    setTestState(Status.INIT);
-  }
   function buttonHandler() {
-    switch (currentTestState) {
-      case Status.INIT:
-        setTestState(Status.CLICKTOSTART);
+    switch (currentFormState) {
+      case FormStatus.INIT:
+        setFormState(FormStatus.CLICKTOSTART);
         break;
-      case Status.CLICKTOSTART:
-        setTestState(Status.TESTWAIT);
+      case FormStatus.CLICKTOSTART:
+        setFormState(FormStatus.TESTWAIT);
         timeout.current = setTimeout(() => {
           prevtime.current = Date.now();
-          setTestState(Status.TESTREACT);
+          setFormState(FormStatus.TESTREACT);
         }, Math.random() * 4000 + 1000);
         break;
-      case Status.TESTWAIT:
+      case FormStatus.TESTWAIT:
         clearTimeout(timeout.current!);
-        setTestState(Status.TESTEARLY);
+        setFormState(FormStatus.TESTEARLY);
         setTimeout(() => {
-          setTestState(Status.CLICKTOSTART);
+          setFormState(FormStatus.CLICKTOSTART);
         }, 2000);
         break;
-      case Status.TESTREACT:
+      case FormStatus.TESTREACT:
         results.current.push(Date.now() - prevtime.current);
-        updateResults({ reactiontests: results.current });
-        setTestState(Status.TESTRESULT);
+        props.updateresults({ reactiontests: results.current });
+        setFormState(FormStatus.TESTRESULT);
         break;
-      case Status.TESTRESULT:
+      case FormStatus.TESTRESULT:
         if (results.current.length < 5) {
-          setTestState(Status.CLICKTOSTART);
+          setFormState(FormStatus.CLICKTOSTART);
+        } else {
+          setFormState(FormStatus.DONE);
         }
         break;
     }
   }
   function _reactionbuttonText() {
-    switch (currentTestState) {
-      case Status.LOCKED:
+    switch (currentFormState) {
+      case FormStatus.LOCKED:
         return <span className="subtletext">Füllen Sie bitte zuerst das Formular aus...</span>;
-        case Status.INIT:
+        case FormStatus.INIT:
           return "Bereit für fünf kurze Reaktionstests?";
-      case Status.CLICKTOSTART:
+      case FormStatus.CLICKTOSTART:
         return (
           <span className="buttontext">
             Diese Fläche <span className="red">wird zuerst rot</span>. Klicken
@@ -73,13 +63,13 @@ function Reactiontest(props : {
             Wenn Sie weiterklicken, startet der Test...
           </span>
         );
-      case Status.TESTWAIT:
+      case FormStatus.TESTWAIT:
         return "Warten auf Grün...";
-      case Status.TESTEARLY:
+      case FormStatus.TESTEARLY:
         return "Zu früh!";
-      case Status.TESTREACT:
+      case FormStatus.TESTREACT:
         return "Klick!";
-      case Status.TESTRESULT:
+      case FormStatus.TESTRESULT:
         return (
           <span className="buttontext">
             Reaktionszeit:{" "}
@@ -91,6 +81,8 @@ function Reactiontest(props : {
             Klicken Sie weiter, wenn Sie bereit sind...
           </span>
         );
+      case FormStatus.DONE:
+        return "Herzlichen Dank für Ihre Teilnahme!";
     }
   }
   return (
@@ -99,7 +91,7 @@ function Reactiontest(props : {
         Reaktionstest
       </label>
       <button
-        className={"reactionbutton " + currentTestState}
+        className={"reactionbutton " + currentFormState}
         onClick={buttonHandler}
         id="reactionbutton"
       >
