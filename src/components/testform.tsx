@@ -2,8 +2,6 @@ import Reactionbutton from "./reactionbutton";
 import React, { useRef, useState } from "react";
 import "./testform.scss";
 
-console.log(process.env.NODE_ENV);
-
 export enum FormStatus {
   LOCKED = "locked",
   INIT = "init",
@@ -24,10 +22,10 @@ export type ReactionFormData = {
 };
 
 function Testform() {
-  const [currentFormState, setFormState] = useState<FormStatus>(
-    FormStatus.LOCKED
-  );
-
+  const initFormStatus =
+    localStorage["reaction-app"] === undefined ? FormStatus.LOCKED : FormStatus.DONE;
+  const [currentFormState, setFormState] = useState<FormStatus>(initFormStatus);
+  
   const formdataRef = useRef<ReactionFormData>({
     gender: null,
     age: null,
@@ -68,22 +66,22 @@ function Testform() {
     console.log("submitting data");
     let url = "";
     if (process.env.NODE_ENV === "development") {
-      url = "https://reactionapp-f88bb-default-rtdb.europe-west1.firebasedatabase.app/testflight.json";
+      url =
+        "https://reactionapp-f88bb-default-rtdb.europe-west1.firebasedatabase.app/testflight.json";
     } else {
-      url = "https://reactionapp-f88bb-default-rtdb.europe-west1.firebasedatabase.app/results.json";
+      url =
+        "https://reactionapp-f88bb-default-rtdb.europe-west1.firebasedatabase.app/results.json";
     }
-    fetch(
-      url,
-      {
-        method: "POST",
-        body: JSON.stringify(formdataRef.current),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    ).then(() => {
+    fetch(url, {
+      method: "POST",
+      body: JSON.stringify(formdataRef.current),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(() => {
       console.log("data submitted");
       setFormState(FormStatus.DONE);
+      localStorage["reaction-app"] = FormStatus.DONE;
     });
   }
 
@@ -99,8 +97,14 @@ function Testform() {
         nimmst, mir für ein Biomedizin-Modul zu helfen und diesen{" "}
         <span className="highlight">anonymen</span> Reaktionstest zu machen.
       </p>
+      {currentFormState === FormStatus.DONE && (
+        <p className="subtletext green">
+          Vielen Dank, dass Du teilgenommen hast!
+        </p>
+      )}
       <div className="control">
-        <label htmlFor="gender">Geschlecht</label><br />
+        <label htmlFor="gender">Geschlecht</label>
+        <br />
         <input
           type="radio"
           id="female"
@@ -126,7 +130,6 @@ function Testform() {
         />
         <label htmlFor="other">Andere</label>
       </div>
-
       <div className="control slider-control">
         <label htmlFor="age">Alter</label>
         <p className="output">{age !== null ? age + " Jahre" : ""}</p>
@@ -143,12 +146,13 @@ function Testform() {
           }}
         />
       </div>
-
       <div className="control slider-control">
         <label htmlFor="gameHours">
           Wie viele Stunden in der Woche spielst Du Computerspiele?
         </label>
-        <p className="output">{gameHours !== null ? gameHours + " Stunden" : ""}</p>
+        <p className="output">
+          {gameHours !== null ? gameHours + " Stunden" : ""}
+        </p>
         <input
           type="range"
           id="gameHours"
@@ -162,12 +166,13 @@ function Testform() {
           }}
         />
       </div>
-
       <div className="control slider-control">
         <label htmlFor="sportHours">
           Wie viele Stunden pro Woche treibst Du Sport?
         </label>
-        <p className="output">{sportHours !== null ? sportHours + " Stunden" : ""}</p>
+        <p className="output">
+          {sportHours !== null ? sportHours + " Stunden" : ""}
+        </p>
         <input
           type="range"
           id="sportHours"
@@ -181,7 +186,6 @@ function Testform() {
           }}
         />
       </div>
-
       <div className="control">
         <label htmlFor="email">
           E-Mail <span className="subtletext">(freiwillig)</span>
