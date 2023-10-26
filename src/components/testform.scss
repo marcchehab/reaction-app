@@ -33,7 +33,7 @@ label {
   }
 
   input[type="email"] {
-    width: 100%;
+    width: 85%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -60,11 +60,6 @@ label {
     &:not(.changed)::-webkit-slider-thumb {
       opacity: 0;
     }
-  }
-
-  span {
-    display: inline-block;
-    margin-top: 5px;
   }
 }
 
