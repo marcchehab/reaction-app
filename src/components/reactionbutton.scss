@@ -1,0 +1,28 @@
+.reactionbutton {
+  width: 100%;
+  min-height: 200px;
+  cursor: pointer;
+  &.init,
+  &.testresult {
+    background-color: rgba(26, 165, 224, 0.507);
+  }
+  &.clicktostart {
+    background-color: rgb(26, 165, 224);
+  }
+  &.testwait {
+    background-color: rgb(214, 89, 76);
+  }
+  &.testreact {
+    background-color: rgb(33, 228, 37);
+  }
+  span.buttontext {
+    line-height: 1.2rem;
+  }
+  span.red {
+    background-color: rgb(214, 89, 76);
+  }
+  span.green {
+    background-color: rgb(33, 228, 37);
+  }
+
+}

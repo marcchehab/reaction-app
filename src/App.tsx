@@ -1,5 +1,4 @@
-import React from 'react';
-import './App.css';
+import './App.scss';
 import Testform from './components/testform';
 
 function App() {
