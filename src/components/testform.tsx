@@ -100,6 +100,7 @@ function Testform() {
         <span className="highlight">anonymen</span> Reaktionstest zu machen.
       </p>
       <div className="control">
+        <label htmlFor="gender">Geschlecht</label><br />
         <input
           type="radio"
           id="female"
@@ -128,7 +129,7 @@ function Testform() {
 
       <div className="control slider-control">
         <label htmlFor="age">Alter</label>
-        <br />
+        <p className="output">{age !== null ? age + " Jahre" : ""}</p>
         <input
           type="range"
           id="age"
@@ -141,19 +142,18 @@ function Testform() {
             e.target.classList.add("changed");
           }}
         />
-        <span>{age !== null ? age + " Jahre" : ""}</span>
       </div>
 
       <div className="control slider-control">
         <label htmlFor="gameHours">
           Wie viele Stunden in der Woche spielst Du Computerspiele?
         </label>
-        <br />
+        <p className="output">{gameHours !== null ? gameHours + " Stunden" : ""}</p>
         <input
           type="range"
           id="gameHours"
           min="0"
-          max="60"
+          max="50"
           value={gameHours !== null ? gameHours : "0"}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setGameHours(Number(e.target.value));
@@ -161,18 +161,18 @@ function Testform() {
             e.target.classList.add("changed");
           }}
         />
-        <span>{gameHours !== null ? gameHours + " Stunden" : ""}</span>
       </div>
 
       <div className="control slider-control">
         <label htmlFor="sportHours">
           Wie viele Stunden pro Woche treibst Du Sport?
         </label>
+        <p className="output">{sportHours !== null ? sportHours + " Stunden" : ""}</p>
         <input
           type="range"
           id="sportHours"
           min="0"
-          max="60"
+          max="20"
           value={sportHours !== null ? sportHours : "0"}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setSportHours(Number(e.target.value));
@@ -180,7 +180,6 @@ function Testform() {
             e.target.classList.add("changed");
           }}
         />
-        <span>{sportHours !== null ? sportHours + " Stunden" : ""}</span>
       </div>
 
       <div className="control">
@@ -197,11 +196,12 @@ function Testform() {
           }}
         />
       </div>
+      <div className="spacer-50"></div>
       <Reactionbutton
         formstate={[currentFormState, setFormState]}
         updateresults={updateResults}
       />
-      <div id="reponse"></div>
+      <div className="spacer-150"></div>
     </div>
   );
 }
